@@ -26,11 +26,9 @@ relate them
     juju add-relation mongodb myapp
     juju add-relation myapp haproxy
 
-scale up your app
+scale up your app (to 10 nodes for example)
 
-    for i in {1..10}; do
-      juju add-unit myapp
-    done
+    juju add-unit -n 10 myapp
 
 open it up to the outside world
 
