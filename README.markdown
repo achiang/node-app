@@ -1,44 +1,42 @@
 
-# juju formula to deploy a user-defined node.js app
+# juju charm to deploy a user-defined node.js app
 
 This is an example 
 [juju](http://juju.ubuntu.com)
-formula to deploy a user-defined node app
+charm to deploy a user-defined node app
 directly from revision control.
 
-This formula will be maintained with a general set of hooks
+This charm will be maintained with a general set of hooks
 for various services that can be used with node apps
 (like mongodb).
 
 
-# Using this formula
+# Using this charm
 
 First, edit `config.yaml` to add info about your app.
 
 Then deploy some basic services
 
-    $ juju deploy --repository ~/formulas node-app myapp
-    $ juju deploy --repository ~/formulas mongodb
-    $ juju deploy --repository ~/formulas haproxy
+    juju deploy node-app myapp
+    juju deploy mongodb
+    juju deploy haproxy
 
 relate them
 
-    $ juju add-relation mongodb myapp
-    $ juju add-relation myapp haproxy
+    juju add-relation mongodb myapp
+    juju add-relation myapp haproxy
 
-scale up your app
+scale up your app (to 10 nodes for example)
 
-    $ for i in {1..10}; do
-    $   juju add-unit myapp
-    $ done
+    juju add-unit -n 10 myapp
 
 open it up to the outside world
 
-    $ juju expose haproxy
+    juju expose haproxy
 
 Find the haproxy instance's public URL from 
 
-    $ juju status
+    juju status
 
 (or attach it to an elastic IP via the aws console)
 and open it up in a browser.
@@ -60,16 +58,16 @@ when related to a `mongodb` service, the formula
 - starts your node app as a service
 
 
-## Formula configuration
+## Charm configuration
 
-Configurable aspects of the formula are listed in `config.yaml`
+Configurable aspects of the charm are listed in `config.yaml`
 and can be set by either editing the default values directly
 in the yaml file or passing a `myapp.yaml` configuration
 file during deployment
 
-    $ juju deploy --repository ~/formulas --config ~/myapp.yaml node-app myapp
+    juju deploy --config ~/myapp.yaml node-app myapp
 
-Some of these parameters are used directly by the formula,
+Some of these parameters are used directly by the charm,
 and some are passed through to the node app using `config/config.js`.
 
 ## Application configuration
@@ -104,7 +102,7 @@ your application using snippets like
 
 ## Network access
 
-This formula does not open any public ports itself.
+This charm does not open any public ports itself.
 The intention is to relate it to a proxy service like
 `haproxy`, which will in turn open port 80 to the outside world.
 This allows for instant horizontal scalability.
@@ -117,7 +115,7 @@ this can easily be done by adding
 to the bottom of the `install` hook, and then once your stack
 is started, you expose
 
-    $ juju expose myapp
+    juju expose myapp
 
 it to the outside world.
 
@@ -128,13 +126,13 @@ internal network interfaces.
 
 # Making this work with your node.js app
 
-This formula makes some strong assumptions
+This charm makes some strong assumptions
 about the structure of the node application 
 (`config/config.js`) that might not apply to your app.
 Please treat this formula as a template that 
 you can fork and modify to suit your needs.
 
-The biggest difference between how the formula
+The biggest difference between how the charm
 behaves for different kind of apps is application
 startup.  A simple application will want to start
 upon install (startup code goes in the `install` hook),
