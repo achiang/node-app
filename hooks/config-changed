@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -eu # -x for verbose logging to juju debug-log
+
+umask 002
+
+install_root=`config-get install_root`
+app_name=`config-get app_name`
+app_dir="$install_root/$app_name"
+app_branch=`config-get app_branch`
+
+cd $app_dir
+
+do_fetch=false;
+
+# Always fetch latest if branch requested
+if git branch|grep -q \^${app_branch}\$; then
+  do_fetch=true;
+else # tag/commit ref
+  if git checkout ${app_branch}; then
+    do_fetch=false;
+  else
+    do_fetch=true;
+  fi
+fi
+
+if $do_fetch; then
+   git fetch $app_branch && git checkout $app_branch
+fi
+
+service ${app_name} restart
