@@ -14,7 +14,7 @@ cd $app_dir
 do_fetch=false;
 
 # Always fetch latest if branch requested
-if git branch|grep -q \^${app_branch}\$; then
+if git branch|grep -q " ${app_branch}\$"; then
   do_fetch=true;
 else # tag/commit ref
   if git checkout ${app_branch}; then
