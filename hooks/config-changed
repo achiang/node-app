@@ -25,7 +25,7 @@ else # tag/commit ref
 fi
 
 if $do_fetch; then
-   git fetch $app_branch && git checkout $app_branch
+   git pull origin && git checkout $app_branch
 fi
 
 service ${app_name} restart
