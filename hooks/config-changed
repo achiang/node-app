@@ -11,6 +11,28 @@ app_user=`config-get app_user`
 app_branch=`config-get app_branch`
 app_port=`config-get app_port`
 
+update_app() {
+    cd $app_dir
+
+    do_fetch=false;
+
+    # Always fetch latest if branch requested
+    if git branch|grep -q " ${app_branch}\$"; then
+	do_fetch=true;
+	git checkout ${app_branch}
+    else # tag/commit ref
+	if git checkout ${app_branch}; then
+	    do_fetch=false;
+	else
+	    do_fetch=true;
+	fi
+    fi
+
+    if $do_fetch; then
+	git pull origin && git checkout $app_branch
+    fi
+}
+
 configure_app() {
   juju-log "Configuring ${app_name}..."
 
@@ -45,4 +67,7 @@ EOS
   fi
 }
 
+update_app
 configure_app
+
+service ${app_name} restart

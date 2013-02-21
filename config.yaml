@@ -18,7 +18,7 @@ options:
   app_branch:
     type: string
     default: master
-    description: Application repository deployment branch
+    description: Application repository deployment branch. Might also be a revision ID (e.g. tag or SHA1 for git) to upgrade/downgrade application.
   install_root:
     type: string
     default: /opt
