@@ -70,4 +70,8 @@ EOS
 update_app
 configure_app
 
+npm update && npm install
+
+chown -Rf ${app_user}.${app_user} ${app_dir}
+
 service ${app_name} restart
