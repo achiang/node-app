@@ -11,22 +11,16 @@ app_branch=`config-get app_branch`
 
 cd $app_dir
 
-do_fetch=false;
-
 # Always fetch latest if branch requested
-if git branch|grep -q " ${app_branch}\$"; then
-  do_fetch=true;
-  git checkout ${app_branch}
-else # tag/commit ref
-  if git checkout ${app_branch}; then
-    do_fetch=false;
-  else
-    do_fetch=true;
+if git checkout origin/${app_branch}; then # is a local branch
+  git fetch origin && git checkout origin/${app_branch}
+else # tag/commit ref?
+  if ! git checkout ${app_branch}; then # commit does not exist locally
+    git fetch origin
+    if ! git checkout origin/${app_branch}; then # not a new remote branch, is a commit ref/tag
+	git checkout $app_branch
+    fi
   fi
-fi
-
-if $do_fetch; then
-   git pull origin && git checkout $app_branch
 fi
 
 npm update && npm install
