@@ -10,19 +10,25 @@ app_dir="$install_root/$app_name"
 app_user=`config-get app_user`
 app_branch=`config-get app_branch`
 app_port=`config-get app_port`
+cron_schedule="*/5 * * * *"
 
 update_app() {
     cd $app_dir
 
+    is_branch=false
+
     # Always fetch latest if branch requested
     if git checkout origin/${app_branch}; then # is a local branch
 	git fetch origin && git checkout origin/${app_branch}
+        is_branch=true
     else # tag/commit ref?
 	if ! git checkout ${app_branch}; then # commit does not exist locally
 	    git fetch origin
 	    if ! git checkout origin/${app_branch}; then # not a new remote branch, is a commit ref/tag
 		git checkout $app_branch
-	    fi
+            else
+                is_branch=true
+            fi
 	fi
     fi
 }
@@ -60,8 +66,64 @@ EOS
   fi
 }
 
+install_cronjob() {
+    update_cron_job_filename=/opt/bin/update_node-app_from_SCM.sh
+
+    if [ $is_branch ]; then
+	if [ ! -d `dirname $update_cron_job_filename` ]; then
+            mkdir -p `dirname $update_cron_job_filename`
+	fi
+
+	cat > $update_cron_job_filename <<EOS
+
+#!/usr/bin/env bash
+
+cd \${app_dir}
+
+old_commit=\`git rev-parse origin/\${app_branch}\`
+
+echo "Checking for updates to \${app_name} branch \${app_branch} commit \${old_commit}"
+
+new_commit=\`git rev-parse origin/\${app_branch}\`
+
+if [ \$old_commit != \$new_commit ]; then
+    echo "Found new latest commit \${new_commit}"
+
+    git fetch origin && git checkout origin/\${app_branch}
+    sudo service \${app_name} restart
+else
+    echo 'No updates found';
+fi
+EOS
+
+	chmod u=rwx,g=r,o=r $update_cron_job_filename
+
+	cat > $update_cron_d_file <<EOF
+app_branch=$app_branch
+app_name=$app_name
+app_dir=$app_dir
+
+$cron_schedule $app_user $update_cron_job_filename 
+EOF
+    else
+        juju-log "Ignoring polling for new code as commit/tag specified"
+
+	if [ -f $update_cron_d_file ]; then
+	    rm $update_cron_d_file
+	fi
+    fi
+}
+
 update_app
 configure_app
+
+update_cron_d_file=/etc/cron.d/${app_name} # TODO: what happens if app_name changes?
+
+if [ "$cron_schedule" != "" ]; then
+    install_cronjob
+elif [ -f $update_cron_d_file ]; then
+    rm $update_cron_d_file
+fi
 
 npm update && npm install
 
