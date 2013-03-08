@@ -83,13 +83,14 @@ cd \${app_dir}
 old_commit=\`git rev-parse origin/\${app_branch}\`
 
 echo "Checking for updates to \${app_name} branch \${app_branch} commit \${old_commit}"
+git fetch origin
 
 new_commit=\`git rev-parse origin/\${app_branch}\`
 
 if [ \$old_commit != \$new_commit ]; then
     echo "Found new latest commit \${new_commit}"
 
-    git fetch origin && git checkout origin/\${app_branch}
+    git checkout origin/\${app_branch}
     sudo service \${app_name} restart
 else
     echo 'No updates found';
