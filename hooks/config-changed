@@ -98,14 +98,16 @@ fi
 EOS
 
 	chmod u=rwx,g=r,o=r $update_cron_job_filename
+        chown ${app_user} $update_cron_job_filename
 
 	cat > $update_cron_d_file <<EOF
 app_branch=$app_branch
 app_name=$app_name
 app_dir=$app_dir
 
-$cron_schedule $app_user $update_cron_job_filename 
+$cron_schedule $app_user $update_cron_job_filename
 EOF
+        chmod u=rwx,g=r,o=r $update_cron_d_file
     else
         juju-log "Ignoring polling for new code as commit/tag specified"
 
