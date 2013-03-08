@@ -10,6 +10,7 @@ app_dir="$install_root/$app_name"
 app_user=`config-get app_user`
 app_branch=`config-get app_branch`
 app_port=`config-get app_port`
+app_node_env=`config-get app_node_env`
 cron_schedule=`config-get polling_schedule`
 
 update_app() {
@@ -49,7 +50,7 @@ configure_app() {
     cat > /etc/juju_nodejs_app_${app_name}.env <<EOS
 {
     "name": "${app_name}"
-    , "node_env": "production"
+    , "node_env": "${app_node_env}"
     , "mongo": ${mongodb_config}
 }
 EOS

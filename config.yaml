@@ -31,3 +31,7 @@ options:
     type: string
     default: ubuntu
     description: run-as user
+  app_node_env:
+    type: string
+    default: production
+    description: The node environment to run as ("production", "development", "test" etc.).
