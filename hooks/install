@@ -32,7 +32,11 @@ install_app() {
     cd ${app_dir} && npm install
   fi
 
-  cat > /etc/init/${app_name}.conf <<EOS
+  # If Procfile found, use it with foreman module
+  if [ -f ${app_dir}/Procfile ]; then
+    npm install -g foreman
+  else
+    cat > /etc/init/${app_name}.conf <<EOS
 description "${app_name} node.js server"
  
 start on (net-device-up
@@ -50,23 +54,9 @@ script
   exec /usr/bin/node ${app_dir}/server.js >> /var/log/${app_name}.log 2>&1 &
 end script
 EOS
+  fi
 }
 [[ -d ${app_dir} ]] || install_app
-
-configure_app() {
-  juju-log "Configuring ${app_name}..."
-
-  config_file_path=${app_dir}/config/config.js
-  if [ -f $config_file_path ]; then
-    sed -i "s/name.*/name\" : \"${app_name}\"/" $config_file_path
-    sed -i "s/listen_port.*/listen_port\" : \"${app_port}\"/" $config_file_path
-  fi
-
-#  #cd ${app_dir}
-#  #sudo -u ${app_user} 'wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz | gzip -d > GeoLiteCity.dat'
-
-}
-configure_app
 
 juju-log "Delaying app startup until mongodb joins" 
 #juju-log "starting app"

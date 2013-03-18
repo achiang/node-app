@@ -22,7 +22,18 @@ configure_app() {
   juju-log "configuring ${app_name} to work with the mongodb service"
 
   config_file_path=$app_dir/config/config.js
-  if [ -f $config_file_path ]; then
+
+  if [ -f ${app_dir}/Procfile ]; then
+    cat > /etc/juju_nodejs_app_${app_name}_mongodb.env <<EOF
+{
+  "host": "${host}"
+, "port": ${port}
+, "replset": "${replset}"
+}
+EOF
+    MY_DIR=`dirname $0`
+    $MY_DIR/config-changed
+  elif [ -f $config_file_path ]; then
     juju-log "Writing $app_name config file $config_file_path"
     sed -i "s/mongo_host.*/mongo_host\" : \"${host}\"/" $config_file_path
     sed -i "s/mongo_port.*/mongo_port\" : ${port}/" $config_file_path
@@ -31,7 +42,6 @@ configure_app() {
 
   app_port=`config-get app_port`
   open-port $app_port/TCP
-
 }
 configure_app
 

@@ -98,7 +98,22 @@ your application using snippets like
     server.listen(config.listen_port);
     ...
 
+Alternatively you could use a "Procfile" in root directory like this:
 
+    web: node app.js
+
+and then get the environment variables from the running environment like this:
+
+    app.set('port', process.env.PORT);
+
+The defined environment variables are:
+
+    NAME
+    PORT
+    NODE_ENV
+    MONGO_HOST
+    MONGO_PORT
+    MONGO_REPLSET
 
 ## Network access
 

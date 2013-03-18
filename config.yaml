@@ -18,7 +18,11 @@ options:
   app_branch:
     type: string
     default: master
-    description: Application repository deployment branch
+    description: Application repository deployment branch. Might also be a revision ID (e.g. tag or SHA1 for git) to upgrade/downgrade application.
+  polling_schedule:
+    type: string
+    default: ""
+    description: Set to a cron schedule string (e.g. "*/5 * * * *" poll each 5 minutes) for polling repo for updates and deploy if new branch contents is found. Set to empty to disable polling.
   install_root:
     type: string
     default: /opt
@@ -27,3 +31,7 @@ options:
     type: string
     default: ubuntu
     description: run-as user
+  app_node_env:
+    type: string
+    default: production
+    description: The node environment to run as ("production", "development", "test" etc.).
