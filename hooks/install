@@ -19,7 +19,7 @@ install_node() {
   juju-log "Installing node..."
   add-apt-repository ppa:chris-lea/node.js
   apt-get update
-  apt-get -y install -qq nodejs nodejs-dev build-essential npm curl
+  apt-get -y install -qq nodejs build-essential curl
 }
 [[ -x /usr/bin/node ]] || install_node
 
