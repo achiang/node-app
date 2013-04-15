@@ -92,6 +92,7 @@ if [ \$old_commit != \$new_commit ]; then
     echo "Found new latest commit \${new_commit}"
 
     git checkout origin/\${app_branch}
+    npm update && npm install
     sudo service \${app_name} restart
 else
     echo 'No updates found';
