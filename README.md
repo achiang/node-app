@@ -1,5 +1,5 @@
 
-# juju charm to deploy a user-defined node.js app
+# Deploy a user-defined node.js application
 
 This is an example 
 [juju](http://juju.ubuntu.com)
@@ -158,4 +158,4 @@ to start up until a database has be associated
 
 # Mirrored
 
-lp:charm/node-app 
+lp:charm/node-app
